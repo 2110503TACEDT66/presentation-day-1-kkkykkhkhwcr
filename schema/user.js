@@ -5,11 +5,13 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please add a user name"],
     match: /^[a-zA-Z0-9\s]+$/,
+    unique: true,
   },
   tel: {
     type: String,
     required: [true, "Please add a telephone number"],
     match: /^\d+$/,
+    unique: true,
   },
   email: {
     type: String,
@@ -23,6 +25,11 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, "Please add a password"],
+  },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
   },
 });
 
