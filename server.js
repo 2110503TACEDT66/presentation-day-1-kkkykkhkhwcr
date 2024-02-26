@@ -15,7 +15,7 @@ connectDB();
 app.use("/", auth);
 app.use("/", dentists);
 app.use("/", booked);
-
+app.use(express.json());
 app.listen(port, () => {
   console.log(`Connect to localhost at port ${port}`);
 });

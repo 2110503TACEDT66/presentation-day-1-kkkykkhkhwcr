@@ -1,7 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-router.route("/").get().post();
-router.route("/:id").get().put().delete();
+const { protect, authorize } = require("../middleware/auth.js");
+
+router.route("/").get(protect, authorize()).post(protect, authorize());
+router
+  .route("/:id")
+  .get(protect, authorize())
+  .put(protect, authorize())
+  .delete(protect, authorize());
 
 module.exports = router;
