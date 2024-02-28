@@ -9,7 +9,7 @@ const Dentist = require("../schema/dentist.js");
 exports.getBookingsByRole = async (req, res, next) => {
   let query;
   if (req.user.role === "user") {
-    query = Booking.find({ email: req.user.email }).populate({
+    query = Booking.find({ name: req.user._id }).populate({
       path: "name dentistName",
       select: "name",
     });
@@ -18,15 +18,24 @@ exports.getBookingsByRole = async (req, res, next) => {
     if (req.body.dentistName) {
       //find by Dentist Name
       console.log("dentistname");
-      query = Booking.find({ dentistName: req.body.dentistName });
+      query = Booking.find({ dentistName: req.body.dentistName }).populate({
+        path: "name dentistName",
+        select: "name",
+      });
     } else if (req.body.date) {
       // find by Date
       console.log("book date");
-      query = Booking.find({ date: req.body.date });
+      query = Booking.find({ date: req.body.date }).populate({
+        path: "name dentistName",
+        select: "name",
+      });
     } else {
       // see all
       console.log("not found");
-      query = Booking.find();
+      query = Booking.find().populate({
+        path: "name dentistName",
+        select: "name",
+      });
     }
   }
   try {
