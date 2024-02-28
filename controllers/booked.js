@@ -11,18 +11,21 @@ exports.getBookingsByRole = async (req, res, next) => {
   if (req.user.role === "user") {
     query = Booking.find({ email: req.user.email }).populate({
       path: "name dentistName",
-      select: "name"
+      select: "name",
     });
   } else {
     // admin
     if (req.body.dentistName) {
       //find by Dentist Name
+      console.log("dentistname");
       query = Booking.find({ dentistName: req.body.dentistName });
     } else if (req.body.date) {
       // find by Date
+      console.log("book date");
       query = Booking.find({ date: req.body.date });
     } else {
       // see all
+      console.log("not found");
       query = Booking.find();
     }
   }
@@ -71,7 +74,7 @@ exports.createBooking = async (req, res, next) => {
     }
     req.body.dentistName = hasDentist;
     const booking = await Booking.create(req.body);
-    res.status(201).json({ success: true, data: booking});
+    res.status(201).json({ success: true, data: booking });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
@@ -81,7 +84,7 @@ exports.createBooking = async (req, res, next) => {
 //  PUT www.project.com/booked/{id}    |    Admin use
 exports.updateBookingByUser = async (req, res, next) => {
   try {
-    let booked = await Booking.findOne({name: req.user.id});
+    let booked = await Booking.findOne({ name: req.user.id });
     console.log(booked);
     if (!booked) {
       return res.status(404).json({
@@ -120,13 +123,18 @@ exports.updateBookingByAdmin = async (req, res, next) => {
         message: `No booking with the id of ${req.params.id}`,
       });
     }
-    appointment = await Appointment.findByIdAndUpdate(req.params.id, req.body, {
+    const hasDentist = await Dentist.findOne({ name: req.body.dentistName });
+    if (!hasDentist) {
+      res.status(404).json({ success: false, message: "Dentist not found" });
+    }
+    req.body.dentistName = hasDentist;
+    const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     });
     res.status(200).json({
       success: true,
-      data: appointment,
+      data: booking,
     });
   } catch (err) {
     console.log(err);
@@ -140,7 +148,7 @@ exports.updateBookingByAdmin = async (req, res, next) => {
 //     DELECT www.project.com/booked/   (use body)      |   admin -> delect id_book
 exports.deleteBookingByAdmin = async (req, res, next) => {
   try {
-    const booked = await Appointment.findById(req.params.id);
+    const booked = await Booking.findById(req.params.id);
 
     if (!booked) {
       return res.status(404).json({
@@ -164,7 +172,7 @@ exports.deleteBookingByAdmin = async (req, res, next) => {
 
 exports.deleteBookingByUser = async (req, res, next) => {
   try {
-    let booked = await Booking.findOne({name: req.user.id});
+    let booked = await Booking.findOne({ name: req.user.id });
     if (!booked) {
       return res.status(404).json({
         success: false,
