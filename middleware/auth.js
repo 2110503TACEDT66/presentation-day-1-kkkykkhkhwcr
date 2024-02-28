@@ -3,20 +3,21 @@ const jwt = require("jsonwebtoken");
 
 exports.protect = async (req, res, next) => {
   let token;
+
   if (
-    req.header.authorization &&
-    req.header.authorization.startWith("Bearer")
+    req.headers.authorization && req.headers.authorization.startsWith('Bearer')
   ) {
-    token = req.header.authorization.split(" ")[1];
+    token = req.headers.authorization.split(' ')[1];
   }
-  if (!token) {
+  
+  if (!token|| token == 'null') {
     res
       .status(401)
       .json({ screen: false, message: "Not authorize to access this route" });
   }
   try {
     const decode = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decode);
+    console.log("decode: ",decode);
     req.user = await User.findById(decode.id);
     next();
   } catch (err) {

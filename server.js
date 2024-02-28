@@ -8,12 +8,12 @@ const dentists = require("./routes/dentist.js");
 const booked = require("./routes/booked.js");
 const port = process.env.PORT;
 
+app.use(express.json());
 connectDB();
 
 app.use("/", auth);
-app.use("/", dentists);
-app.use("/", booked);
-app.use(express.json());
+app.use("/dentists", dentists);
+app.use("/booked", booked);
 app.listen(port, () => {
   console.log(`Connect to localhost at port ${port}`);
 });

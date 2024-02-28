@@ -1,5 +1,6 @@
 const express = require("express");
 const Booking = require("../schema/booked.js");
+const Dentist = require("../schema/dentist.js");
 
 //     GET www.project.com/booked/ (don't use body)  |  use getBookingsByRole   |   user  -> owner book
 //     GET www.project.com/booked/ (don't use body)  |  use getBookingsByRole   |   admin -> all book
@@ -7,10 +8,10 @@ const Booking = require("../schema/booked.js");
 
 exports.getBookingsByRole = async (req, res, next) => {
   let query;
-  if (res.user.role === "user") {
+  if (req.user.role === "user") {
     query = Booking.find({ email: req.user.email }).populate({
-      path: "booked",
-      select: "name , date , dentistName",
+      path: "name dentistName",
+      select: "name"
     });
   } else {
     // admin
@@ -58,35 +59,42 @@ exports.createBooking = async (req, res, next) => {
     // already booking
     req.body.name = req.user.id;
     const existingBooking = await Booking.find({ name: req.user.id });
-    if (existingBooking) {
+    if (existingBooking.length !== 0) {
       return res.status(400).json({
         success: false,
         message: "Booking already exists for this user",
       });
     }
-    req.body.dentistName = req.dentist.id;
-    const hasDentist = await Booking.find({ dentistName: req.dentist.id });
-    if (hasDentist) {
-      const booking = await Booking.create(req.body);
-      res.status(201).json({ success: true, data: booking });
+    const hasDentist = await Dentist.findOne({ name: req.body.dentistName });
+    if (!hasDentist) {
+      res.status(404).json({ success: false, message: "Dentist not found" });
     }
+    req.body.dentistName = hasDentist;
+    const booking = await Booking.create(req.body);
+    res.status(201).json({ success: true, data: booking});
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-//  POST www.project.com/booked/        |    User use
-//  POST www.project.com/booked/{id}    |    Admin use
+//  PUT www.project.com/booked/        |    User use
+//  PUT www.project.com/booked/{id}    |    Admin use
 exports.updateBookingByUser = async (req, res, next) => {
   try {
-    let booked = await Booking.findById(req.user.id);
+    let booked = await Booking.findOne({name: req.user.id});
+    console.log(booked);
     if (!booked) {
       return res.status(404).json({
         success: false,
         message: `No booking with the id of ${req.user.id}`,
       });
     }
-    booked = await Booking.findByIdAndUpdate(req.user.id, req.body, {
+    const hasDentist = await Dentist.findOne({ name: req.body.dentistName });
+    if (!hasDentist) {
+      res.status(404).json({ success: false, message: "Dentist not found" });
+    }
+    req.body.dentistName = hasDentist;
+    booked = await Booking.findByIdAndUpdate(booked, req.body, {
       new: true,
       runValidators: true,
     });
@@ -130,7 +138,6 @@ exports.updateBookingByAdmin = async (req, res, next) => {
 
 //     DELECT www.project.com/booked/ (don't use body)  |   user  -> delect owner book
 //     DELECT www.project.com/booked/   (use body)      |   admin -> delect id_book
-// delete /booked/{:id} | bookedID -> user -> userID !== user.userID -> user.role === admin -> delete
 exports.deleteBookingByAdmin = async (req, res, next) => {
   try {
     const booked = await Appointment.findById(req.params.id);
@@ -157,7 +164,7 @@ exports.deleteBookingByAdmin = async (req, res, next) => {
 
 exports.deleteBookingByUser = async (req, res, next) => {
   try {
-    let booked = await Booking.findById(req.user.id);
+    let booked = await Booking.findOne({name: req.user.id});
     if (!booked) {
       return res.status(404).json({
         success: false,

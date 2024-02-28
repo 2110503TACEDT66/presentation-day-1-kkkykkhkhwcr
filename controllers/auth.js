@@ -39,17 +39,15 @@ exports.login = async (req, res, next) => {
 };
 
 exports.logout = async (req, res, next) => {
-  try {
-    res.clearCookie("token");
-    return res
-      .status(200)
-      .json({ success: true, msg: "Logged out successfully" });
-  } catch (err) {
-    console.log(err);
-    return res
-      .status(400)
-      .json({ success: true, msg: "Can't logged out. I don't know why." });
-  }
+  res.cookie('token','none',{
+    expires: new Date(Date.now() + 10*1000),
+    httpOnly: true
+  });
+  res.status(200).json({
+    success: true,
+    msg: "Logged out successfully",
+    data:{}
+  })
 };
 
 const sendTokenResponse = (user, statusCode, res) => {

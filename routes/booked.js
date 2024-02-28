@@ -31,8 +31,8 @@ module.exports = router;
 //     GET www.project.com/booked/        |  use getBookingsByRole      |   admin -> all book / according to conditions {use Body}
 //     GET www.project.com/booked/{id}    |  use getBookingById         |   admin -> id_book
 
-//     POST www.project.com/booked/       |  use updateBookingByUser    |   user  -> owner book
-//     POST www.project.com/booked/{id}   |  use updateBookingByAdmin   |   admin -> id_book
+//     PUT  www.project.com/booked/       |  use updateBookingByUser    |   user  -> owner book
+//     PUT  www.project.com/booked/{id}   |  use updateBookingByAdmin   |   admin -> id_book
 
 //     DELETE www.project.com/booked/     |  use deleteBookingByUser    |   user  -> owner book
 //     DELETE www.project.com/booked/{id} |  use deleteBookingByAdmin   |   admin  -> id_book
