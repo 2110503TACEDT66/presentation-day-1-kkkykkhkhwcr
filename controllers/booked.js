@@ -85,7 +85,7 @@ exports.createBooking = async (req, res, next) => {
     const booking = await Booking.create(req.body);
     res.status(201).json({ success: true, data: booking });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
@@ -117,7 +117,7 @@ exports.updateBookingByUser = async (req, res, next) => {
   } catch (err) {
     console.log(err);
     return res
-      .status(500)
+      .status(400)
       .json({ success: false, message: "Cannot update booking" });
   }
 };
@@ -148,7 +148,7 @@ exports.updateBookingByAdmin = async (req, res, next) => {
   } catch (err) {
     console.log(err);
     return res
-      .status(500)
+      .status(400)
       .json({ success: false, message: "Cannot update Appointment" });
   }
 };
@@ -172,7 +172,7 @@ exports.deleteBookingByAdmin = async (req, res, next) => {
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: "Cannot delete Appointment",
     });
@@ -195,7 +195,7 @@ exports.deleteBookingByUser = async (req, res, next) => {
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: "Cannot delete Appointment",
     });

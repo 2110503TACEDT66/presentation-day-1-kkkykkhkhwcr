@@ -4,7 +4,7 @@ const dentistSchema = mongoose.Schema({
   name: {
     type: String,
     required: [true, "Please add dentist name"],
-    match: /^a-zA-Z\s/,
+    match: /^[a-zA-Z\s]+$/,
   },
   experience: {
     type: Number,
