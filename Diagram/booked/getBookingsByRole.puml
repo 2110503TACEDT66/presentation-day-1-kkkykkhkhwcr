@@ -1,0 +1,53 @@
+@startuml Manage Booked (GET ALL)
+
+header Sameple Dentist Booking Sequence Diagram
+footer Page %page% of %lastpage%
+title "Manage Booked (GET ALL)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:booked" as routerBooked
+participant "<<controllers>>\n:booked" as controllersBooked
+participant "<<model>>\n:booked" as modelBooked
+database "<<MongoDB>>\n:booked" as BookedDatabase
+
+client->server: req.get('/booked/')
+server->routerBooked: app.use('/booked',booked)
+routerBooked -> controllersBooked: getBookingsByRole()
+activate controllersBooked
+
+alt   req.user.role === "user"
+    controllersBooked->modelBooked: find({ name: req.user._id })
+    activate modelBooked
+    modelBooked ->BookedDatabase ++: BookedSchema
+        BookedDatabase --> modelBooked --: booked
+    modelBooked-->controllersBooked: booked
+    deactivate modelBooked
+else
+    alt req.body.dentistName
+    controllersBooked->modelBooked: find({ dentistName: req.body.dentistName })
+    activate modelBooked
+    modelBooked ->BookedDatabase ++: BookedSchema
+        BookedDatabase --> modelBooked --: booked
+    modelBooked-->controllersBooked: booked
+    deactivate modelBooked
+    else alt req.body.date
+        controllersBooked->modelBooked: find({ date: req.body.date })
+        activate modelBooked
+        modelBooked ->BookedDatabase ++: BookedSchema
+        BookedDatabase --> modelBooked --: booked
+        modelBooked-->controllersBooked: booked
+        deactivate modelBooked
+    else
+        controllersBooked->modelBooked: find()
+        activate modelBooked
+        modelBooked ->BookedDatabase ++: BookedSchema
+        BookedDatabase --> modelBooked --: booked
+        modelBooked-->controllersBooked: booked
+        deactivate modelBooked
+    end
+end
+
+controllersBooked->client: response
+
+@enduml

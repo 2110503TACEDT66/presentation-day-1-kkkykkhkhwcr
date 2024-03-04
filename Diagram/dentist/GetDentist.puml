@@ -1,0 +1,24 @@
+@startuml Manage Dentist (GET ONE)
+
+header Sameple Dentist Booking Sequence Diagram
+footer Page %page% of %lastpage%
+title "Manage Booked (GET ONE)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:dentist" as routerDentist
+participant "<<controllers>>\n:dentist" as controllersDentist
+participant "<<model>>\n:dentist" as modelDentist
+database "<<MongoDB>>\n:dentist" as DentistDatabase
+
+client->server ++:req.get('/dentist/:id')
+server->routerDentist ++:app.use('/dentist/:id' , dentist)
+routerDentist -> controllersDentist ++:getDentist()
+controllersDentist -> modelDentist --:dentist
+modelDentist ->DentistDatabase ++: DentistSchema
+DentistDatabase --> modelDentist --: dentist
+controllersDentist <-- modelDentist --:dentist
+
+controllersDentist->client --:response
+
+@enduml
