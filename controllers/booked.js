@@ -79,7 +79,9 @@ exports.createBooking = async (req, res, next) => {
     }
     const hasDentist = await Dentist.findOne({ name: req.body.dentistName });
     if (!hasDentist) {
-      res.status(404).json({ success: false, message: "Dentist not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Dentist not found" });
     }
     req.body.dentistName = hasDentist;
     const booking = await Booking.create(req.body);
@@ -134,7 +136,9 @@ exports.updateBookingByAdmin = async (req, res, next) => {
     }
     const hasDentist = await Dentist.findOne({ name: req.body.dentistName });
     if (!hasDentist) {
-      res.status(404).json({ success: false, message: "Dentist not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Dentist not found" });
     }
     req.body.dentistName = hasDentist;
     const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, {

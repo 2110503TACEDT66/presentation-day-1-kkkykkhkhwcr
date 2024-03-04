@@ -25,7 +25,28 @@ exports.getDentist = async (req, res, next) => {
 
 exports.getDentists = async (req, res, next) => {
   let query;
-  query = Dentist.find();
+  const reqQuery = { ...req.query };
+  const removeFields = ["select", "sort", "page", "limit"];
+  removeFields.forEach((param) => delete reqQuery[param]);
+  console.log(reqQuery);
+  let queryStr = JSON.stringify(reqQuery);
+  queryStr = queryStr.replace(
+    /\b(gt|gte|lt|lte|in)\b/g,
+    (match) => `$${match}`
+  );
+  query = Dentist.find(JSON.parse(queryStr));
+  if (req.query.select) {
+    const fields = req.query.select.split(",").join(" ");
+    query = query.select(fields);
+  }
+  //Sort
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(",").join(" ");
+    query = query.sort(sortBy);
+  } else {
+    query = query.sort("name");
+  }
+  //query = Dentist.find();
   try {
     let dentists = await query;
     res.status(200).json({
