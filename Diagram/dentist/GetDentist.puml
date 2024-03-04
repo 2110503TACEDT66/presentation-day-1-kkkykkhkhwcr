@@ -14,7 +14,7 @@ database "<<MongoDB>>\n:dentist" as DentistDatabase
 client->server ++:req.get('/dentist/:id')
 server->routerDentist ++:app.use('/dentist/:id' , dentist)
 routerDentist -> controllersDentist ++:getDentist()
-controllersDentist -> modelDentist --:dentist
+controllersDentist -> modelDentist --:findById(req.params.id)
 modelDentist ->DentistDatabase ++: DentistSchema
 DentistDatabase --> modelDentist --: dentist
 controllersDentist <-- modelDentist --:dentist
