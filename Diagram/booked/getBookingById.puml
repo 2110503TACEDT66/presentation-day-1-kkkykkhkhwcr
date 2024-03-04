@@ -11,9 +11,9 @@ participant "<<controllers>>\n:booked" as controllersBooked
 participant "<<model>>\n:Hospital" as modelBooked
 database "<<MongoDB>>\n:booked" as BookedDatabase
 
-client->server ++:req.get('/booked')
-server->routerBooked ++:app.use('/booked',booked)
-routerBooked -> controllersBooked ++:getBookingsByRole()
+client->server ++:req.get('/booked/:id')
+server->routerBooked ++:app.use('/booked/:id',booked)
+routerBooked -> controllersBooked ++:getBookingsById()
 controllersBooked->modelBooked ++:find({ name: req.user._id })
 modelBooked ->BookedDatabase ++: BookedSchema
 BookedDatabase --> modelBooked --: booked

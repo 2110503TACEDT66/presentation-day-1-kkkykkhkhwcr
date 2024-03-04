@@ -13,9 +13,16 @@ participant "<<model>>\n:dentist" as modelDentist
 database "<<MongoDB>>\n:booked" as BookedDatabase
 database "<<MongoDB>>\n:dentist" as DentistSchema
 
-client->server: req.put('/booked/')
-server->routerBooked: app.use('/booked',booked)
-routerBooked -> controllersBooked: updateBookingByUser()
+
+client->server: req.put('/booked/:id')
+server->routerBooked: app.use('/booked/:id',booked)
+routerBooked -> controllersBooked: updateBookingByAdmin()
+activate controllersBooked
+controllersBooked->modelBooked: findById(req.params.id);
+modelBooked ->BookedDatabase ++: BookedSchema
+BookedDatabase --> modelBooked --: booked
+modelBooked-->controllersBooked: existingBooking
+alt   existingBooking.length !== 0
     controllersBooked->modelDentist: find({ name: req.body.dentistName })
     modelDentist ->DentistSchema ++: DentistSchema
     DentistSchema --> modelDentist --: dentist
@@ -26,6 +33,8 @@ routerBooked -> controllersBooked: updateBookingByUser()
     BookedDatabase --> modelBooked --: booked
     modelBooked-->controllersBooked: booked
     end
+end
+
 controllersBooked->client: response
 
 @enduml

@@ -20,7 +20,7 @@ alt req.user.role === "user"
     modelDentist -> controllersDentist --:dentist
 end
 alt req.user.role === "admin"
-    controllersDentist->modelDentist ++:successfully enter
+    controllersDentist->modelDentist ++:deleteOne()
 modelDentist ->DentistDatabase ++: DentistSchema
 DentistDatabase --> modelDentist --: dentist
 controllersDentist <-- modelDentist --:dentist
