@@ -1,0 +1,40 @@
+@startuml Manage Booked (PUT)
+
+header Sameple Dentist Booking Sequence Diagram
+footer Page %page% of %lastpage%
+title "Manage Booked (PUT)"
+
+participant "Client" as client
+participant "<<javaScript>>\n:server" as server
+participant "<<router>>\n:booked" as routerBooked
+participant "<<controllers>>\n:booked" as controllersBooked
+participant "<<model>>\n:booked" as modelBooked
+participant "<<model>>\n:dentist" as modelDentist
+database "<<MongoDB>>\n:booked" as BookedDatabase
+database "<<MongoDB>>\n:dentist" as DentistSchema
+
+
+client->server: req.put('/booked/:id')
+server->routerBooked: app.use('/booked/:id',booked)
+routerBooked -> controllersBooked: updateBookingByAdmin()
+activate controllersBooked
+controllersBooked->modelBooked: findById(req.params.id);
+modelBooked ->BookedDatabase ++: BookedSchema
+BookedDatabase --> modelBooked --: booked
+modelBooked-->controllersBooked: existingBooking
+alt   existingBooking.length !== 0
+    controllersBooked->modelDentist: find({ name: req.body.dentistName })
+    modelDentist ->DentistSchema ++: DentistSchema
+    DentistSchema --> modelDentist --: dentist
+    modelDentist-->controllersBooked: hasDentist
+    alt !hasDentist
+    controllersBooked->modelBooked: findByIdAndUpdate(req.params.id, req.body)
+    modelBooked ->BookedDatabase ++: BookedSchema
+    BookedDatabase --> modelBooked --: booked
+    modelBooked-->controllersBooked: booked
+    end
+end
+
+controllersBooked->client: response
+
+@enduml
